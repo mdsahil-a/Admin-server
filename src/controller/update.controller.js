@@ -269,33 +269,38 @@ catch(error){
 }
 
 }
-export const updateProfilePic=async(req,res)=>{
+export const updateProfilePic = async (req, res) => {
+    try {
+        const fileData = req.file;
 
-    const fileData=req.file;
-   
-try{
-if(!fileData){
-    return res.status(404).json({message:"Image Not found!!"});
+        console.log("REQ FILE:", fileData);
 
-}
+        if (!fileData) {
+            return res.status(404).json({ message: "Image Not found!!" });
+        }
 
-const result=await cloudinary.uploader.upload(fileData.path);
-fs.unlinkSync(fileData.path);
-if(result){
+        // Convert buffer → Base64
+        const base64Image = `data:${fileData.mimetype};base64,${fileData.buffer.toString("base64")}`;
 
-    let userId="123456789";
-    const user=await Details.findOne({userId});
-    user.image=result.secure_url;
-     await user.save();
-    console.log(user);
-     return res.status(200).json({message:"Image updated successfully",success:true});
-}
-res.status(400).json({message:"Failed to upload image"});
+        // Upload to Cloudinary
+        const result = await cloudinary.uploader.upload(base64Image, {
+            folder: "profile_pics",
+        });
 
-}
-catch(error){
+        // Update user
+        let userId = "123456789";
+        const user = await Details.findOne({ userId });
 
-    console.log("Error in upload profile pic:",error.message);
-    return res.status(500).json({message:"Internal server error"});
-}
+        user.image = result.secure_url;
+        await user.save();
+
+        return res.status(200).json({
+            message: "Image updated successfully",
+            success: true
+        });
+
+    } catch (error) {
+        console.log("Error in upload profile pic:", error.message);
+        return res.status(500).json({ message: "Internal server error" });
+    }
 }
