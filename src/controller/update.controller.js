@@ -60,7 +60,7 @@ res.status(201).json({message:"Resume updated successfully"});
     }
     catch(error){
 
-    }
+    } 
 }
 export const updateProfession=async (req,res)=>{
     const {profession,userId}=req.body;
@@ -204,19 +204,30 @@ res.status(201).json({message:"Skill added successfully"});
 
 
 export const addProject=async (req,res)=>{
-    const {image,name,about,techs,URL}=req.body;
+    const {name,about,URL}=req.body;
+    const {techs}=JSON.parse(req.body.techs);
+    const fileData=req.file;
+
+    console.log(req.body);
     try{
-if(!image || !name || !about || !techs || !URL ){
-    return res.status(400).json({message:"Required Address"});
-}
+
+                const image = `data:${fileData.mimetype};base64,${fileData.buffer.toString("base64")}`;
+      
+// if(!image || !name || !about || !techs || !URL ){
+//     return res.status(400).json({message:"Bad request"});
+// }
+
+      const result = await cloudinary.uploader.upload(image);
+
 
 const project=new Project({
     name,
-    image,
+    image:result.secure_url,
     url:URL,
     about,
     techs
-})
+});
+console.log(project);
 project.save();
 res.status(201).json({project ,message:"Project uploaded successfully"});
     }
