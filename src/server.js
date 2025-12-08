@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 import updateSkillRoute from "./route/updateSkill.route.js";
 import authRoute from "./route/auth.route.js";
 import cors from "cors";
-
+console.log();
  const app=express();
  dotenv.config();
  app.use(cors());
