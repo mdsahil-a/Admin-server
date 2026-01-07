@@ -205,7 +205,7 @@ res.status(201).json({message:"Skill added successfully"});
 
 export const addProject=async (req,res)=>{
     const {name,about,URL}=req.body;
-    const {techs}=JSON.parse(req.body.techs);
+    const techs=JSON.parse(req.body.techs);
     const fileData=req.file;
 
     console.log(req.body);
